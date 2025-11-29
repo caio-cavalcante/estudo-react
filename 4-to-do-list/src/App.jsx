@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 
+// tomorrow i'll add notes on what and why i'm doing, so i understand myself
 function App() {
     const [tasks, setTasks] = useState([]);
     const [inputValue, setInputValue] = useState("");
@@ -18,7 +19,22 @@ function App() {
         setInputValue("");
     };
 
-    // tomorrow i'll add update and delete functions
+    const toggleTaskCompletion = (taskId) => {
+        const newTasks = tasks.map((task) => {
+            if (task.id === taskId) {
+                return { ...task, isCompleted: !task.isCompleted };
+            }
+
+            return task;
+        })
+
+        setTasks(newTasks);
+    }
+
+    const deleteTask = (taskId) => {
+        const newTasks = tasks.filter((task) => task.id !== taskId);
+        setTasks(newTasks);
+    }
 
     return (
         <div className="App">
@@ -35,14 +51,17 @@ function App() {
                 <button onCLick={handleAddTask}>Add</button>
             </div>
 
-            <div className="task-list">
+            <ul className="task-list">
                 {tasks.map((task) => (
-                    <div key={task.id} className="{`task ${task.completed ? 'completed' : ''}`}">
-                        <span>{task.text}</span>
-                        {/* i need to add update and delete functions */}
-                    </div>
+                    <li key={task.id} className="{`task ${task.completed ? 'completed' : ''}`}">
+                        <span onClick={() => toggleTaskCompletion(task.id)}>
+                            {task.text}
+                        </span>
+
+                        <button onClick={() => deleteTask(task.id)}>X</button>
+                    </li>
                 ))}
-            </div>
+            </ul>
         </div>
     );
 }
