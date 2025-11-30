@@ -24,7 +24,6 @@ li {
     align-items: center;
 }
 
-/* Essa classe é adicionada condicionalmente pelo React */
 li.done span {
     text-decoration: line-through;
     color: #888;
