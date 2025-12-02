@@ -5,6 +5,8 @@ function App() {
     // states are used to store data and update the UI dinamically 
     const [tasks, setTasks] = useState([]);
     const [inputValue, setInputValue] = useState("");
+    const [editId, setEditId] = useState(null);
+    const [editValue, setEditValue] = useState("");
 
     // this functions works as the C in CRUD, to create new items in the tasks array, according to the user input
     const handleAddTask = () => {
@@ -40,11 +42,48 @@ function App() {
         setTasks(newTasks); // again, practicing the immutability concept, where no array is altered, just copied
     }
 
+    const startEdit = (taskId) => {
+        const taskToEdit = tasks.find((task) => task.id === taskId);
+        setEditId(taskId);
+        setEditValue(taskToEdit.text);
+    }
+
+    const saveEdit = (taskId) => {
+        const trimmedEditValue = editValue.trim();
+        
+        if (trimmedEditValue === editId.text) {
+            cancelEdit();
+            return;
+        }
+
+        if (!trimmedEditValue) {
+            alert("Task can't be empty");
+            return;
+        }
+
+        const newTasks = tasks.map((task) => {
+            if (task.id === taskId) {
+                return { ...task, text: editValue };
+            }
+
+            return task;
+        });
+
+        setTasks(newTasks);
+        setEditId(null);
+        setEditValue('');
+    }
+
+    const cancelEdit = () => {
+        setEditId(null);
+        setEditValue('');
+    }
+
     return (
-        <div className="App">
+        <div className="container">
             <h1>My To-Do List</h1>
 
-            <div className="add-task">
+            <div className="input-group">
                 <input
                     type="text"
                     placeholder="Add a task"
@@ -56,14 +95,45 @@ function App() {
                 <button onClick={handleAddTask}>Add</button> {/* tasks can also be added with the button */}
             </div>
 
-            <ul className="task-list">
+            <ul className="list">
                 {tasks.map((task) => ( // map is used as a for each, and this is the R in CRUD, Reading all the tasks
                     <li key={task.id} className={`task ${task.isCompleted ? 'done' : ''}`}> {/* class name will change the styling of the task */}
-                        <span onClick={() => toggleTaskCompletion(task.id)}> {/* if the span element is clicked, the toggleTaskCompletion function will be called, and change the isCompleted boolean */}
-                            {task.text}
-                        </span>
+                        {task.id === editId ? (
+                            <>
+                                <input
+                                    type="text"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') saveEdit(task.id);
+                                        if (e.key === 'Escape') cancelEdit();
+                                    }}
+                                    autoFocus
+                                />
 
-                        <button onClick={() => deleteTask(task.id)}>X</button> {/* just to delete on click */}
+                                <button 
+                                    className="save-button" 
+                                    onClick={() => saveEdit()}>
+                                    Save
+                                </button>
+
+                                <button 
+                                    className="cancel-button" 
+                                    onClick={cancelEdit}>
+                                    Cancel
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <span onClick={() => toggleTaskCompletion(task.id)}> {/* if the span element is clicked, the toggleTaskCompletion function will be called, and change the isCompleted boolean */}
+                                    {task.text}
+                                </span>
+
+                                <button className="edit-button" onClick={() => startEdit(task.id)}>Edit</button>
+
+                                <button className="delete-button" onClick={() => deleteTask(task.id)}>X</button> {/* just to delete on click */}
+                            </>
+                        )}
                     </li>
                 ))}
             </ul>
