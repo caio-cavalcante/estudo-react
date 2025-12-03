@@ -42,41 +42,43 @@ function App() {
         setTasks(newTasks); // again, practicing the immutability concept, where no array is altered, just copied
     }
 
+    // this is needed to change the text of the task to an input field
     const startEdit = (taskId) => {
         const taskToEdit = tasks.find((task) => task.id === taskId);
-        setEditId(taskId);
-        setEditValue(taskToEdit.text);
+        setEditId(taskId); // now the editId is the same as the clicked taskId 
+        setEditValue(taskToEdit.text); // and the editValue is the text of the task
     }
 
+    // before saving the edited task, some checks are needed
     const saveEdit = (taskId) => {
-        const trimmedEditValue = editValue.trim();
-        
-        if (trimmedEditValue === editId.text) {
-            cancelEdit();
+        const trimmedEditValue = editValue.trim(); // removes leading and trailing spaces
+
+        if (trimmedEditValue === editId.text) { // if the trimmedEditValue is the same as the task text
+            cancelEdit(); // just cancel the edit to avoid unnecessary state updates
             return;
         }
 
-        if (!trimmedEditValue) {
-            alert("Task can't be empty");
+        if (!trimmedEditValue) { // if the trimmedEditValue is empty
+            alert("Task can't be empty"); // display an alert to encourage the user to write something or cancel
             return;
         }
 
-        const newTasks = tasks.map((task) => {
-            if (task.id === taskId) {
-                return { ...task, text: editValue };
+        const newTasks = tasks.map((task) => { // map is used as a for each
+            if (task.id === taskId) { // in the task where taskId is the same as the clicked taskId
+                return { ...task, text: editValue }; // change the text to the new edited one
             }
 
             return task;
         });
 
-        setTasks(newTasks);
-        setEditId(null);
-        setEditValue('');
+        setTasks(newTasks); // update the tasks array
+        setEditId(null); // reset the editId to allow new edits
+        setEditValue(''); // also reset the editValue for the same reason
     }
 
-    const cancelEdit = () => {
-        setEditId(null);
-        setEditValue('');
+    const cancelEdit = () => { // in case the user wants to cancel the edit
+        setEditId(null); // the resets happen again
+        setEditValue(''); // allowing new edits in the future
     }
 
     return (
@@ -103,12 +105,12 @@ function App() {
                                 <input
                                     type="text"
                                     value={editValue}
-                                    onChange={(e) => setEditValue(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') saveEdit(task.id);
-                                        if (e.key === 'Escape') cancelEdit();
+                                    onChange={(e) => setEditValue(e.target.value)} // this will then always alter the editValue to match what is being written
+                                    onKeyDown={(e) => { // allow the user to save or cancel the edit
+                                        if (e.key === 'Enter') saveEdit(task.id); // with Enter key
+                                        if (e.key === 'Escape') cancelEdit(); // with Escape key
                                     }}
-                                    autoFocus
+                                    autoFocus // focus on the input field when the user triggers an edit
                                 />
 
                                 <button 
@@ -130,6 +132,7 @@ function App() {
                                 </span>
 
                                 <button className="edit-button" onClick={() => startEdit(task.id)}>Edit</button>
+                                {/* the startEdit function will used to link the taskId to the editId, then adding the textValue to an input field */}
 
                                 <button className="delete-button" onClick={() => deleteTask(task.id)}>X</button> {/* just to delete on click */}
                             </>
